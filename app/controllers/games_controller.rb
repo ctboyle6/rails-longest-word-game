@@ -16,6 +16,7 @@ class GamesController < ApplicationController
     @letters = params[:letters]
     dictionary_json = call_dictionary
     @response = ''
+    @score = 0
 
     if check_validity? && check_letter_overuse?
       @response = "Congrats! #{@attempt} is an English word!"
@@ -23,7 +24,9 @@ class GamesController < ApplicationController
       @response = dictionary_json[:found] == false ? 'not an English word!' : "cannot be built out of #{@letters}"
     end
 
-    raise
+    @score = dictionary_json[:length] * 1000
+
+    # raise
   end
 end
 
