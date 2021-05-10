@@ -12,13 +12,14 @@ class GamesController < ApplicationController
   end
 
   def score
-    attempt = params[:answer]
-    url = "https://wagon-dictionary.herokuapp.com/#{attempt}"
-    dictionary_serial = open(url).read
-    dictionary_json = JSON.parse(dictionary_serial)
+    @attempt = params[:answer]
+    @letters = params[:letters]
+    dictionary_json = call_dictionary
     @response = ''
 
-    unless check_validity(attempt) && check_letter_overuse(attempt)
+    if check_validity? && check_letter_overuse?
+      @response = "Congrats! #{@attempt} is an English word!"
+    else
       @response = dictionary_json[:found] == false ? 'not an English word!' : "cannot be built out of #{@letters}"
     end
 
@@ -28,12 +29,18 @@ end
 
 private
 
-def check_validity(attempt)
-  attempt.chars.all? { |char| @letters.include?(char.upcase) }
+def call_dictionary
+  url = "https://wagon-dictionary.herokuapp.com/#{@attempt}"
+  dictionary_serial = open(url).read
+  JSON.parse(dictionary_serial)
 end
 
-def check_letter_overuse(attempt)
-  attempt.chars.all? { |char| attempt.count(char) <= @letters.count(char.upcase) }
+def check_validity?
+  @attempt.chars.all? { |char| @letters.include?(char.upcase) }
+end
+
+def check_letter_overuse?
+  @attempt.chars.all? { |char| @attempt.count(char) <= @letters.count(char.upcase) }
 end
 
 # { time: end_time - start_time,
