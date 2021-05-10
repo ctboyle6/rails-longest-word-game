@@ -9,6 +9,8 @@ class GamesController < ApplicationController
     10.times do
       @letters << alphabet.sample
     end
+
+    @letters
   end
 
   def score
@@ -18,15 +20,14 @@ class GamesController < ApplicationController
     @response = ''
     @score = 0
 
-    if check_validity? && check_letter_overuse?
+    if check_validity? && check_letter_overuse? && dictionary_json['found'] == true
       @response = "Congrats! #{@attempt} is an English word!"
+      @score = dictionary_json['length'] * 1000
     else
-      @response = dictionary_json[:found] == false ? 'not an English word!' : "cannot be built out of #{@letters}"
+      @response = dictionary_json['found'] == false ? 'not an English word!' : "cannot be built out of #{@letters}"
     end
 
-    @score = dictionary_json[:length] * 1000
-
-    # raise
+    raise
   end
 end
 
